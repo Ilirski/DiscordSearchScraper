@@ -1,24 +1,62 @@
-# python generated files
+# Python generated files
 __pycache__/
-*.py[oc]
+*.py[cod]
+*$py.class
+*.so
+.Python
 build/
+develop-eggs/
 dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
 wheels/
-*.egg-info
+pip-wheel-metadata/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
 
-# rye
-target
-.venv
+# uv
+.venv/
+uv.lock
+
+# Testing
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+.tox/
+.nox/
+coverage.xml
+*.cover
+*.log
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Environment
 .env
-/x
-site
-__pycache__
-.idea
-token.txt
-dist
+.env.local
+.env.*.local
 
-# project files
+# Project-specific
+token.txt
 *.json
 *.jsonl
 *.csv
-*.txt
+
+# Rye (deprecated - can be removed after migration)
+target
+/x
+site

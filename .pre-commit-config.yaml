@@ -1,0 +1,54 @@
+# Pre-commit hooks configuration
+# See https://pre-commit.com for more information
+
+repos:
+  - repo: local
+    hooks:
+      # Ruff linter - extremely fast Python linter
+      - id: ruff
+        name: ruff
+        entry: uv run ruff check --fix
+        language: system
+        types: [python]
+        require_serial: false
+
+      # Ruff formatter - fast Python formatter
+      - id: ruff-format
+        name: ruff-format
+        entry: uv run ruff format
+        language: system
+        types: [python]
+        require_serial: false
+
+  # Optional: Add some general pre-commit hooks from the pre-commit ecosystem
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      # Check for files that contain merge conflict markers
+      - id: check-merge-conflict
+      # Check for broken symlinks
+      - id: check-symlinks
+      # Detect trailing whitespace
+      - id: trailing-whitespace
+        exclude: ^(\.git/|\.venv/|htmlcov/)
+      # Ensure files end with a newline
+      - id: end-of-file-fixer
+        exclude: ^(\.git/|\.venv/|htmlcov/)
+      # Check YAML files for valid syntax
+      - id: check-yaml
+      # Check TOML files for valid syntax
+      - id: check-toml
+      # Prevent large files from being committed
+      - id: check-added-large-files
+        args: ['--maxkb=1000']
+      # Detect private keys that might have been accidentally committed
+      - id: detect-private-key
+      # Check for JSON files with valid syntax
+      - id: check-json
+      # Sort requirements.txt files
+      - id: sort-simple-yaml
+        files: ^(pre-commit-config|\.clang-format)\.yaml$
+
+# Global configuration
+default_stages: [commit]
+fail_fast: false

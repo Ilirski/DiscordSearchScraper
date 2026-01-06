@@ -1,7 +1,7 @@
 import json
 
 # We want three columns: AuthorID, AuthorName, Content, and DateTime
-with open("./AstelZoom.json", "r", encoding="utf-8") as f:
+with open("./AstelZoom.json", encoding="utf-8") as f:
     for line in f:
         msg = json.loads(line)[0]
         with open("AstelZoom.csv", "a", encoding="utf-8") as file:

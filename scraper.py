@@ -1,14 +1,13 @@
-import json
 import datetime
-import math
-import requests
-import time
+import json
 import logging
+import math
 import optparse
 import os
-from typing import Optional
 import re
+import time
 
+import requests
 
 DISCORD_EPOCH = 1420070400000
 
@@ -41,12 +40,12 @@ class DiscordSearcher:
     def __init__(
         self,
         guild_id: str,
-        token: Optional[str] = None,
-        query: Optional[str] = None,
-        output: Optional[str] = None,
-        channel_id: Optional[str] = None,
-        after: Optional[str] = None,
-        before: Optional[str] = None,
+        token: str | None = None,
+        query: str | None = None,
+        output: str | None = None,
+        channel_id: str | None = None,
+        after: str | None = None,
+        before: str | None = None,
     ) -> None:
         if not token:
             # Check if token is in environment variable
@@ -79,7 +78,7 @@ class DiscordSearcher:
         self.set_output(output)
         self.form_search_query(guild_id, query, channel_id, after, before)
 
-    def set_output(self, output: Optional[str] = None) -> None:
+    def set_output(self, output: str | None = None) -> None:
         """Set the output file."""
         if not output:
             self.output = self.generate_filename()
@@ -110,10 +109,10 @@ class DiscordSearcher:
     def form_search_query(
         self,
         guild_id: str,
-        content: Optional[str] = None,
-        channel_id: Optional[str] = None,
-        after: Optional[str] = None,
-        before: Optional[str] = None,
+        content: str | None = None,
+        channel_id: str | None = None,
+        after: str | None = None,
+        before: str | None = None,
     ) -> None:
         """Form a search query for Discord's Search API."""
         if not guild_id:
@@ -135,9 +134,7 @@ class DiscordSearcher:
         if before is not None:
             query_params["max_id"] = before
 
-        search_query = (
-            requests.Request("GET", base_url, params=query_params).prepare().url
-        )
+        search_query = requests.Request("GET", base_url, params=query_params).prepare().url
         self.query = search_query
 
     def search(self, query: str) -> dict:
@@ -199,9 +196,7 @@ class DiscordSearcher:
         request_count = 1
         total_request_count = 1
 
-        logging.info(
-            f"Total results: {total_results}, iterating {total_request_needed} times"
-        )
+        logging.info(f"Total results: {total_results}, iterating {total_request_needed} times")
 
         try:
             while True:
@@ -245,9 +240,7 @@ if __name__ == "__main__":
         help="Output file or directory path. If a directory is specified, file names will be generated automatically based on the channel names and export parameters. Directory paths must end with a slash to avoid ambiguity.",
     )
     cliparser.add_option("-q", "--query", dest="query", help="Search query")
-    cliparser.add_option(
-        "-c", "--channel", dest="channel_id", help="Channel ID (optional)"
-    )
+    cliparser.add_option("-c", "--channel", dest="channel_id", help="Channel ID (optional)")
     cliparser.add_option(
         "-a",
         "--after",
@@ -290,12 +283,10 @@ if __name__ == "__main__":
 
     if options.from_last:
         if not output:
-            cliparser.error(
-                "Output file must be specified to continue from the last message ID"
-            )
+            cliparser.error("Output file must be specified to continue from the last message ID")
         if not os.path.exists(output):
             cliparser.error("Output file does not exist")
-        with open(output, "r") as f:
+        with open(output) as f:
             last_line = f.readlines()[-1]
             last_message = json.loads(last_line)
             after = last_message[0]["id"]
@@ -303,7 +294,5 @@ if __name__ == "__main__":
             # I suspect it's due to logging.basicConfig being called in the DiscordSearcher class.
             print(f"Overwriting --after with last message ID: {after}")
 
-    searcher = DiscordSearcher(
-        guild_id, token, query, output, channel_id, after, before
-    )
+    searcher = DiscordSearcher(guild_id, token, query, output, channel_id, after, before)
     searcher.retrieve_query_results()

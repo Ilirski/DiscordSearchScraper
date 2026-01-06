@@ -1,18 +1,35 @@
-# Fix weird run-time bug: https://stackoverflow.com/questions/74884770/python-exec-usr-local-bin-python3-exec-format-error-on-docker-while-using-ap
-FROM python:3.12.3-slim-bullseye as build
+# Use uv for fast dependency installation
+FROM python:3.13-slim-bookworm AS builder
 
-RUN useradd -m dss
+# Install uv
+COPY --from=ghcr.io/astral-sh/uv:latest /uv /usr/local/bin/uv
+
+# Set environment variables
+ENV PYTHONUNBUFFERED=1 \
+    PYTHONDONTWRITEBYTECODE=1 \
+    UV_COMPILE_BYTECODE=1 \
+    UV_LINK_MODE=copy
 
 WORKDIR /app
-COPY requirements.lock ./
-RUN PYTHONDONTWRITEBYTECODE=1 pip install --no-cache-dir -r requirements.lock
 
-COPY scraper.py .
+# Copy dependency files
+COPY pyproject.toml ./
 
-RUN mkdir /out && chown dss:dss /out
+# Install dependencies using uv (faster than pip)
+RUN uv sync --frozen --no-dev
+
+# Create non-root user
+RUN useradd -m -u 1000 dss
+
+# Copy application code
+COPY scraper.py ./
+
+# Create output directory
+RUN mkdir -p /out && chown -R dss:dss /out /app
+
 USER dss
-
 WORKDIR /out
 
-ENTRYPOINT ["python", "/app/scraper.py"]
+# Run the application using uv run
+ENTRYPOINT ["uv", "run", "--no-dev", "python", "/app/scraper.py"]
 
